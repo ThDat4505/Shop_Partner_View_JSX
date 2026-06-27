@@ -1,0 +1,4 @@
+[
+  { "id": "f1", "shopId": "shopA", "name": "Shop A Burger", "category": "Burger", "price": "10", "image": "burger.png" },
+  { "id": "f2", "shopId": "shopB", "name": "Shop B Pizza", "category": "Pizza", "price": "15", "image": "pizza.png" }
+]
