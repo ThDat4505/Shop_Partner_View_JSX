@@ -1,0 +1,12 @@
+[
+  {
+    "username": "shopA",
+    "password": "password123",
+    "shopId": "shopA"
+  },
+  {
+    "username": "shopB",
+    "password": "securepassword456",
+    "shopId": "shopB"
+  }
+]
