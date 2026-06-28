@@ -1,0 +1,12 @@
+[
+  {
+    "username": "Walmart",
+    "password": "password123",
+    "shopId": "Walmart"
+  },
+  {
+    "username": "BigBasket",
+    "password": "securepassword456",
+    "shopId": "BigBasket"
+  }
+]

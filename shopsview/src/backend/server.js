@@ -22,11 +22,11 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage });
-const filePath = path.join(__dirname, 'foods.json');
+const filePath = path.join(__dirname, 'items.json'); // Changed filename
 const ordersFilePath = path.join(__dirname, 'orders.json');
 const usersFilePath = path.join(__dirname, 'users.json');
 
-const readFoodsFile = () => {
+const readItemsFile = () => { // Changed function name
   if (fs.existsSync(filePath)) {
     const raw = fs.readFileSync(filePath, 'utf8');
     return raw ? JSON.parse(raw) : [];
@@ -50,7 +50,7 @@ const readUsersFile = () => {
   return [];
 };
 
-const writeFoodsFile = (data) => {
+const writeItemsFile = (data) => { // Changed function name
   fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
 };
 
@@ -58,15 +58,15 @@ const writeOrdersFile = (data) => {
   fs.writeFileSync(ordersFilePath, JSON.stringify(data, null, 2));
 };
 
-// 1. CREATE: Add Food attached to a specific Shop
-app.post('/add-food', upload.single('image'), (req, res) => {
+// 1. CREATE: Add Item attached to a specific Shop
+app.post('/add-item', upload.single('image'), (req, res) => { // Changed route path
   try {
     const { name, description, price, category, shopId } = req.body;
-    const foods = readFoodsFile();
+    const items = readItemsFile();
 
-    const food = {
+    const item = {
       id: Date.now().toString(),
-      shopId: shopId || "General", // Fallback safety allocation
+      shopId: shopId || "General",
       name,
       description,
       price: parseFloat(price),
@@ -74,10 +74,10 @@ app.post('/add-food', upload.single('image'), (req, res) => {
       image: req.file ? req.file.filename : null
     };
 
-    foods.push(food);
-    writeFoodsFile(foods);
+    items.push(item);
+    writeItemsFile(items);
 
-    res.json({ success: true, food });
+    res.json({ success: true, item });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
@@ -88,14 +88,11 @@ app.post('/login', (req, res) => {
     const { username, password } = req.body;
     const users = readUsersFile();
 
-    // Find a user that matches both credentials perfectly
     const user = users.find(u => u.username === username && u.password === password);
 
     if (user) {
-      // Success! Return their unique shop identification string
       res.json({ success: true, shopId: user.shopId });
     } else {
-      // Access Denied
       res.status(401).json({ success: false, message: "Invalid username or password." });
     }
   } catch (err) {
@@ -103,15 +100,15 @@ app.post('/login', (req, res) => {
   }
 });
 
-// 2. READ: Get Foods belonging ONLY to a specific shop
-app.get('/list-food', (req, res) => {
+// 2. READ: Get Items belonging ONLY to a specific shop
+app.get('/list-item', (req, res) => { // Changed route path
   const { shopId } = req.query;
-  let foods = readFoodsFile();
+  let items = readItemsFile();
 
   if (shopId) {
-    foods = foods.filter(item => item.shopId === shopId);
+    items = items.filter(item => item.shopId === shopId);
   }
-  res.json({ success: true, data: foods });
+  res.json({ success: true, data: items });
 });
 
 // 3. READ: Get Orders belonging ONLY to a specific shop
@@ -125,19 +122,19 @@ app.get('/list-orders', (req, res) => {
   res.json({ success: true, data: orders });
 });
 
-// 4. UPDATE: Edit Food
-app.put('/edit-food/:id', upload.single('image'), (req, res) => {
+// 4. UPDATE: Edit Item
+app.put('/edit-item/:id', upload.single('image'), (req, res) => { // Changed route path
   try {
     const { id } = req.params;
     const { name, description, price, category } = req.body;
-    let foods = readFoodsFile();
+    let items = readItemsFile();
 
-    const foodIndex = foods.findIndex(item => item.id === id);
-    if (foodIndex === -1) {
-      return res.status(404).json({ success: false, message: "Food item not found" });
+    const itemIndex = items.findIndex(item => item.id === id);
+    if (itemIndex === -1) {
+      return res.status(404).json({ success: false, message: "Inventory item not found" });
     }
 
-    let updatedImage = foods[foodIndex].image;
+    let updatedImage = items[itemIndex].image;
     if (req.file) {
       if (updatedImage) {
         const oldPath = path.join(__dirname, 'uploads', updatedImage);
@@ -146,8 +143,8 @@ app.put('/edit-food/:id', upload.single('image'), (req, res) => {
       updatedImage = req.file.filename;
     }
 
-    foods[foodIndex] = {
-      ...foods[foodIndex],
+    items[itemIndex] = {
+      ...items[itemIndex],
       name,
       description,
       price: parseFloat(price),
@@ -155,8 +152,8 @@ app.put('/edit-food/:id', upload.single('image'), (req, res) => {
       image: updatedImage
     };
 
-    writeFoodsFile(foods);
-    res.json({ success: true, message: "Updated successfully", data: foods[foodIndex] });
+    writeItemsFile(items);
+    res.json({ success: true, message: "Updated successfully", data: items[itemIndex] });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
@@ -183,24 +180,24 @@ app.put('/update-order-status/:id', (req, res) => {
   }
 });
 
-// 6. DELETE: Remove Food
-app.delete('/delete-food/:id', (req, res) => {
+// 6. DELETE: Remove Item
+app.delete('/delete-item/:id', (req, res) => { // Changed route path
   try {
     const { id } = req.params;
-    let foods = readFoodsFile();
+    let items = readItemsFile();
 
-    const foodItem = foods.find(item => item.id === id);
-    if (!foodItem) {
-      return res.status(404).json({ success: false, message: "Food item not found" });
+    const inventoryItem = items.find(item => item.id === id);
+    if (!inventoryItem) {
+      return res.status(404).json({ success: false, message: "Product item not found" });
     }
 
-    if (foodItem.image) {
-      const imgPath = path.join(__dirname, 'uploads', foodItem.image);
+    if (inventoryItem.image) {
+      const imgPath = path.join(__dirname, 'uploads', inventoryItem.image);
       if (fs.existsSync(imgPath)) fs.unlinkSync(imgPath);
     }
 
-    foods = foods.filter(item => item.id !== id);
-    writeFoodsFile(foods);
+    items = items.filter(item => item.id !== id);
+    writeItemsFile(items);
 
     res.json({ success: true, message: "Deleted successfully" });
   } catch (err) {

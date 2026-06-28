@@ -1,0 +1,36 @@
+[
+  {
+    "id": "f1",
+    "shopId": "Walmart",
+    "name": "Shop A Burger",
+    "category": "Food",
+    "price": 10,
+    "image": "burger.png"
+  },
+  {
+    "id": "1782603966182",
+    "shopId": "Walmart",
+    "name": "Beef",
+    "description": "It is fat",
+    "price": 10,
+    "category": "Food",
+    "image": "1782603966154.png"
+  },
+  {
+    "id": "f2",
+    "shopId": "shopB",
+    "name": "Shop B Pizza",
+    "category": "Beverages",
+    "price": "15",
+    "image": "pizza.png"
+  },
+  {
+    "id": "1782603966182",
+    "shopId": "BigBasket",
+    "name": "Boomerang",
+    "description": "It flys back",
+    "price": 13,
+    "category": "Baby Care",
+    "image": "1782603966154.png"
+  }
+]

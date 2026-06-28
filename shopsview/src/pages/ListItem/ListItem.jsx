@@ -1,34 +1,29 @@
 import React, { useEffect, useState } from 'react';
+import { SHOP_CATEGORIES } from '../../utils/categories';
 
-const ListFood = ({ shopId }) => {
+const ListItem = ({ shopId }) => {
   const url = 'http://localhost:4000';
   const [list, setList] = useState([]);
 
-  // Category filter state ('All' displays everything)
   const [filterCategory, setFilterCategory] = useState('All');
+  const categories = SHOP_CATEGORIES[shopId] || [];
 
-  // Modals visibility toggles
   const [showEditModal, setShowEditModal] = useState(false);
   const [showEditConfirm, setShowEditConfirm] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  // Track currently active data objects
-  const [currentFood, setCurrentFood] = useState(null);
+  const [currentItem, setCurrentItem] = useState(null);
   const [editImage, setEditImage] = useState(null);
 
-  // All categories declared in AddFood.jsx
-  const categories = ["Cake", "Burger", "Pizza", "Rolls", "Salad", "Noodle", "Dessert"];
-
-  // Fetch all elements from backend
   const fetchList = async () => {
       try {
-        const response = await fetch(`${url}/list-food?shopId=${shopId}`); // <-- Update this fetch URL line
+        const response = await fetch(`${url}/list-item?shopId=${shopId}`);
         const result = await response.json();
         if (result.success) {
           setList(result.data);
         }
       } catch (error) {
-        console.error("Error fetching list data:", error);
+        console.error("Error fetching inventory data:", error);
       }
   };
 
@@ -36,23 +31,21 @@ const ListFood = ({ shopId }) => {
     fetchList();
   }, []);
 
-  // Handlers to open actions
-  const openEdit = (food) => {
-    setCurrentFood({ ...food });
+  const openEdit = (item) => {
+    setCurrentItem({ ...item });
     setEditImage(null);
     setShowEditConfirm(false);
     setShowEditModal(true);
   };
 
-  const openDelete = (food) => {
-    setCurrentFood(food);
+  const openDelete = (item) => {
+    setCurrentItem(item);
     setShowDeleteModal(true);
   };
 
-  // Handle Input Changes inside Edit Modal
   const onEditChangeHandler = (e) => {
     const { name, value } = e.target;
-    setCurrentFood(prev => ({ ...prev, [name]: value }));
+    setCurrentItem(prev => ({ ...prev, [name]: value }));
   };
 
   const handleEditSubmitForm = (e) => {
@@ -60,19 +53,18 @@ const ListFood = ({ shopId }) => {
     setShowEditConfirm(true);
   };
 
-  // Submit PUT updates to Server once confirmed
   const handleUpdate = async () => {
     const formData = new FormData();
-    formData.append('name', currentFood.name);
-    formData.append('description', currentFood.description);
-    formData.append('price', currentFood.price);
-    formData.append('category', currentFood.category);
+    formData.append('name', currentItem.name);
+    formData.append('description', currentItem.description);
+    formData.append('price', currentItem.price);
+    formData.append('category', currentItem.category);
     if (editImage) {
       formData.append('image', editImage);
     }
 
     try {
-      const response = await fetch(`${url}/edit-food/${currentFood.id}`, {
+      const response = await fetch(`${url}/edit-item/${currentItem.id}`, {
         method: 'PUT',
         body: formData,
       });
@@ -83,14 +75,13 @@ const ListFood = ({ shopId }) => {
         fetchList();
       }
     } catch (error) {
-      console.error("Error updating item:", error);
+      console.error("Error updating stock item:", error);
     }
   };
 
-  // Submit DELETE query to Server
   const handleDelete = async () => {
     try {
-      const response = await fetch(`${url}/delete-food/${currentFood.id}`, {
+      const response = await fetch(`${url}/delete-item/${currentItem.id}`, {
         method: 'DELETE',
       });
       const result = await response.json();
@@ -99,11 +90,10 @@ const ListFood = ({ shopId }) => {
         fetchList();
       }
     } catch (error) {
-      console.error("Error deleting item:", error);
+      console.error("Error deleting stock item:", error);
     }
   };
 
-  // Filter the list dynamically based on the dropdown selection
   const filteredList = list.filter(item => {
     if (filterCategory === 'All') return true;
     return item.category === filterCategory;
@@ -112,25 +102,25 @@ const ListFood = ({ shopId }) => {
   return (
     <div className="container-fluid mt-4">
 
-      {/* HEADER AND FILTER ROW */}
-      <div className="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-4 gap-3">
-        <h2 className="mb-0">All Food Items</h2>
+      {/* Dynamic Category Filtering Row */}
+      <div className="mb-4 d-flex gap-2 flex-wrap align-items-center">
+        <span className="fw-bold text-secondary me-2">Filter Category:</span>
+        <button
+          className={`btn btn-sm px-3 rounded-pill ${filterCategory === 'All' ? 'btn-dark' : 'btn-outline-dark'}`}
+          onClick={() => setFilterCategory('All')}
+        >
+          All Items
+        </button>
 
-        {/* Category Pull-Down Menu */}
-        <div className="d-flex align-items-center gap-2" style={{ maxWidth: '300px' }}>
-          <label htmlFor="categoryFilter" className="form-label mb-0 fw-bold text-nowrap">Filter By:</label>
-          <select
-            id="categoryFilter"
-            className="form-select bg-white shadow-sm"
-            value={filterCategory}
-            onChange={(e) => setFilterCategory(e.target.value)}
+        {categories.map((cat, index) => (
+          <button
+            key={index}
+            className={`btn btn-sm px-3 rounded-pill ${filterCategory === cat ? 'btn-primary' : 'btn-outline-secondary'}`}
+            onClick={() => setFilterCategory(cat)}
           >
-            <option value="All">All Categories</option>
-            {categories.map((cat) => (
-              <option key={cat} value={cat}>{cat}</option>
-            ))}
-          </select>
-        </div>
+            {cat}
+          </button>
+        ))}
       </div>
 
       {/* TABLE WORKSPACE CONTAINER */}
@@ -139,7 +129,7 @@ const ListFood = ({ shopId }) => {
           <thead className="table-light">
             <tr>
               <th scope="col">Image</th>
-              <th scope="col">Name</th>
+              <th scope="col">Item Name</th>
               <th scope="col">Category</th>
               <th scope="col">Price</th>
               <th scope="col" className="text-end">Actions</th>
@@ -187,13 +177,12 @@ const ListFood = ({ shopId }) => {
                 </tr>
               ))
             ) : (
-              /* EMPTY FILTER FALLBACK TEXT */
               <tr>
                 <td colSpan="5" className="text-center py-5 text-muted">
                   <i className="bi bi-inbox fs-2 d-block mb-2 text-secondary"></i>
                   {filterCategory === 'All'
-                    ? "No food data stored yet. Go add some!"
-                    : `No items found under "${filterCategory}". Add more items of this category!`}
+                    ? "No inventory items stored yet. Go add some!"
+                    : `No items found under "${filterCategory}".`}
                 </td>
               </tr>
             )}
@@ -202,7 +191,7 @@ const ListFood = ({ shopId }) => {
       </div>
 
       {/* --- EDIT MODAL OVERLAY --- */}
-      {showEditModal && currentFood && (
+      {showEditModal && currentItem && (
         <div className="modal d-block bg-dark bg-opacity-50" tabIndex="-1">
           <div className="modal-dialog modal-dialog-centered">
 
@@ -216,17 +205,17 @@ const ListFood = ({ shopId }) => {
                   <p className="text-muted">Please check the new values below before updating:</p>
                   <div className="text-center mb-3">
                     <img
-                      src={editImage ? URL.createObjectURL(editImage) : `${url}/uploads/${currentFood.image}`}
+                      src={editImage ? URL.createObjectURL(editImage) : `${url}/uploads/${currentItem.image}`}
                       alt="Confirmed preview"
                       className="img-thumbnail"
                       style={{ width: '120px', height: '120px', objectFit: 'cover' }}
                     />
                   </div>
                   <div className="p-3 bg-light rounded border">
-                    <p className="mb-2"><strong>Name:</strong> {currentFood.name}</p>
-                    <p className="mb-2"><strong>Description:</strong> {currentFood.description}</p>
-                    <p className="mb-2"><strong>Category:</strong> <span className="badge bg-secondary">{currentFood.category}</span></p>
-                    <p className="mb-0"><strong>Price:</strong> <span className="text-success fw-bold">${currentFood.price}</span></p>
+                    <p className="mb-2"><strong>Item Name:</strong> {currentItem.name}</p>
+                    <p className="mb-2"><strong>Description:</strong> {currentItem.description}</p>
+                    <p className="mb-2"><strong>Category:</strong> <span className="badge bg-secondary">{currentItem.category}</span></p>
+                    <p className="mb-0"><strong>Price:</strong> <span className="text-success fw-bold">${currentItem.price}</span></p>
                   </div>
                 </div>
                 <div className="modal-footer">
@@ -237,14 +226,14 @@ const ListFood = ({ shopId }) => {
             ) : (
               <form className="modal-content" onSubmit={handleEditSubmitForm}>
                 <div className="modal-header">
-                  <h5 className="modal-title">Edit Food Item</h5>
+                  <h5 className="modal-title">Edit Catalog Item</h5>
                   <button type="button" className="btn-close" onClick={() => setShowEditModal(false)}></button>
                 </div>
                 <div className="modal-body">
                   <div className="mb-3 text-center">
                     <label htmlFor="modal-image" className="form-label d-block">
                       <img
-                        src={editImage ? URL.createObjectURL(editImage) : `${url}/uploads/${currentFood.image}`}
+                        src={editImage ? URL.createObjectURL(editImage) : `${url}/uploads/${currentItem.image}`}
                         alt="Preview"
                         className="img-thumbnail"
                         style={{ width: '100px', height: '100px', objectFit: 'cover', cursor: 'pointer' }}
@@ -260,16 +249,16 @@ const ListFood = ({ shopId }) => {
                   </div>
 
                   <div className="mb-3">
-                    <label className="form-label">Name</label>
-                    <input type="text" name="name" className="form-control" required value={currentFood.name} onChange={onEditChangeHandler} />
+                    <label className="form-label">Item Name</label>
+                    <input type="text" name="name" className="form-control" required value={currentItem.name} onChange={onEditChangeHandler} />
                   </div>
                   <div className="mb-3">
                     <label className="form-label">Description</label>
-                    <textarea name="description" className="form-control" rows="3" required value={currentFood.description} onChange={onEditChangeHandler}></textarea>
+                    <textarea name="description" className="form-control" rows="3" required value={currentItem.description} onChange={onEditChangeHandler}></textarea>
                   </div>
                   <div className="mb-3">
                     <label className="form-label">Category</label>
-                    <select name="category" className="form-control" value={currentFood.category} onChange={onEditChangeHandler}>
+                    <select name="category" className="form-control" value={currentItem.category} onChange={onEditChangeHandler}>
                       {categories.map((cat) => (
                         <option key={cat} value={cat}>{cat}</option>
                       ))}
@@ -277,7 +266,7 @@ const ListFood = ({ shopId }) => {
                   </div>
                   <div className="mb-3">
                     <label className="form-label">Price ($)</label>
-                    <input type="number" name="price" className="form-control" required value={currentFood.price} onChange={onEditChangeHandler} />
+                    <input type="number" name="price" className="form-control" required value={currentItem.price} onChange={onEditChangeHandler} />
                   </div>
                 </div>
                 <div className="modal-footer">
@@ -292,7 +281,7 @@ const ListFood = ({ shopId }) => {
       )}
 
       {/* --- DELETE CONFIRMATION MODAL OVERLAY --- */}
-      {showDeleteModal && currentFood && (
+      {showDeleteModal && currentItem && (
         <div className="modal d-block bg-dark bg-opacity-50" tabIndex="-1">
           <div className="modal-dialog modal-dialog-centered">
             <div className="modal-content">
@@ -301,18 +290,18 @@ const ListFood = ({ shopId }) => {
                 <button type="button" className="btn-close btn-close-white" onClick={() => setShowDeleteModal(false)}></button>
               </div>
               <div className="modal-body">
-                <p>Are you sure you want to permanently remove this food item?</p>
+                <p>Are you sure you want to permanently remove this stock item from inventory?</p>
                 <div className="d-flex align-items-center gap-3 p-2 border rounded bg-light">
                   <img
-                    src={`${url}/uploads/${currentFood.image}`}
+                    src={`${url}/uploads/${currentItem.image}`}
                     alt=""
                     className="img-thumbnail"
                     style={{ width: '70px', height: '70px', objectFit: 'cover' }}
                   />
                   <div>
-                    <h6 className="mb-1">{currentFood.name}</h6>
-                    <span className="badge bg-secondary me-2">{currentFood.category}</span>
-                    <strong className="text-danger">${currentFood.price}</strong>
+                    <h6 className="mb-1">{currentItem.name}</h6>
+                    <span className="badge bg-secondary me-2">{currentItem.category}</span>
+                    <strong className="text-danger">${currentItem.price}</strong>
                   </div>
                 </div>
               </div>
@@ -328,4 +317,4 @@ const ListFood = ({ shopId }) => {
   );
 };
 
-export default ListFood;
+export default ListItem;

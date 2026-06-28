@@ -1,7 +1,7 @@
 [
   {
     "id": "ord_101",
-    "shopId": "shopA",
+    "shopId": "Walmart",
     "name": "John Doe",
     "phone": "0912345678",
     "address": "123 Baker Street",
@@ -11,7 +11,7 @@
   },
   {
     "id": "ord_102",
-    "shopId": "shopB",
+    "shopId": "BigBasket",
     "name": "Alice Smith",
     "phone": "0987654321",
     "address": "456 Pizza Avenue",

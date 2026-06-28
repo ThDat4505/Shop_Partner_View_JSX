@@ -1,0 +1,40 @@
+export const SHOP_CATEGORIES = {
+  Walmart: [
+    "Arts Crafts & Sewing",
+    "Auto & Tires",
+    "Baby",
+    "Beauty",
+    "Clothing",
+    "Collectibles",
+    "Electronics",
+    "Food",
+    "Health and Medicine",
+    "Home",
+    "Home Improvement",
+    "Household Essentials",
+    "Jewelry",
+    "Party & Occasions",
+    "Patio & Garden",
+    "Personal Care",
+    "Pets",
+    "Premium Beauty",
+    "Seasonal",
+    "Shop with Purpose",
+    "Sports & Outdoors",
+    "Subscriptions",
+    "Toys"
+  ],
+  BigBasket: [
+    "Baby Care",
+    "Bakery, Cakes & Dairy",
+    "Beauty & Hygiene",
+    "Beverages",
+    "Cleaning & Household",
+    "Eggs, Meat & Fish",
+    "Foodgrains, Oil & Masala",
+    "Fruits & Vegetables",
+    "Gourmet & World Food",
+    "Kitchen, Garden & Pets",
+    "Snacks & Branded Foods"
+  ]
+};

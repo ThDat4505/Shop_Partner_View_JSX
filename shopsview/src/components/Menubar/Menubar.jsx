@@ -10,7 +10,7 @@ const Menubar = ({ toggleSidebar, shopId, onLogout }) => {
 
                 {/* Visual Active Account Label */}
                 <span className="ms-3 fw-bold text-dark">
-                  Portal: <span className="badge bg-dark text-uppercase ms-1">{shopId}</span>
+                  Shop Partner: <span className="badge bg-dark text-uppercase ms-1">{shopId}</span>
                 </span>
 
                 <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"><span className="navbar-toggler-icon"></span></button>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import AddFood from './pages/AddFood/AddFood';
-import ListFood from './pages/ListFood/ListFood';
+import AddItem from './pages/AddItem/AddItem';
+import ListItem from './pages/ListItem/ListItem';
 import Orders from './pages/Orders/Orders';
 import SignIn from './pages/SignIn/SignIn';
 import Sidebar from './components/Sidebar/Sidebar';
@@ -11,7 +11,6 @@ const App = () => {
     const [sidebarVisible, setSidebarVisible] = useState(true);
     const [currentShopId, setCurrentShopId] = useState(null);
 
-    // Read existing caching attributes on execution
     useEffect(() => {
         const savedShop = localStorage.getItem('currentShopId');
         if (savedShop) setCurrentShopId(savedShop);
@@ -26,7 +25,6 @@ const App = () => {
         setCurrentShopId(null);
     };
 
-    // AUTH GUARD: Prevent layout loading if unauthorized
     if (!currentShopId) {
         return <SignIn onLoginSuccess={(id) => setCurrentShopId(id)} />;
     }
@@ -44,8 +42,8 @@ const App = () => {
 
                 <div className="container-fluid">
                     <Routes>
-                        <Route path='/add' element={<AddFood shopId={currentShopId} />} />
-                        <Route path='/list' element={<ListFood shopId={currentShopId} />} />
+                        <Route path='/add' element={<AddItem shopId={currentShopId} />} />
+                        <Route path='/list' element={<ListItem shopId={currentShopId} />} />
                         <Route path='/orders' element={<Orders shopId={currentShopId} />} />
                         <Route path='/' element={<Navigate to="/list" />} />
                         <Route path='*' element={<Navigate to="/list" />} />
